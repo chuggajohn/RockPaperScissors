@@ -49,9 +49,18 @@ def claculateHand(img):
         cv2.drawContours(drawing, [hull], 0, (0, 0, 255), 3)
 
         isFinishCal,cnt = calculateFingers(res,drawing)
-        return drawing;            
-        #cv2.imshow('output', drawing)
-    return np.zeros(img.shape+(3,), np.uint8)
+        text = ""                 
+        if cnt == 0:
+            text = "Rock"
+        elif cnt == 1:
+            text = "Scissors"
+        elif cnt == 4:
+            text = "Paper"
+        else:
+            text = "Unknown"
+
+        return text
+    return "Unknown"
     
 cam = cv2.VideoCapture(0)
 rectkernel = cv2.getStructuringElement(cv2.MORPH_RECT,(9,9))
@@ -91,10 +100,27 @@ while True:
     #cv2.imshow("median", Medianed)
     closing = cv2.morphologyEx(Medianed, cv2.MORPH_CLOSE, rectkernel)
     #cv2.imshow("closing", closing)
+    orgrighthalf , orglefthalf= np.hsplit(frame,2)
     righthalf ,lefthalf = np.hsplit(closing,2)
-    completeframe = np.hstack((claculateHand(righthalf),line,claculateHand(lefthalf)))
-    cv2.imshow('test' , np.array(completeframe, dtype = np.uint8 ) )
     
+    completeframe = np.hstack((orgrighthalf,line,orglefthalf))
+    cv2.putText(completeframe, #target image
+            claculateHand(righthalf), #text
+            (175, 400), #position
+            cv2.FONT_HERSHEY_DUPLEX,
+            1.0,
+            (118, 185, 0), #font color
+            2);
+    cv2.putText(completeframe, #target image
+            claculateHand(lefthalf), #text
+            (450, 400), #position
+            cv2.FONT_HERSHEY_DUPLEX,
+            1.0,
+            (118, 185, 0), #font color
+            2);        
+            
+    
+    cv2.imshow('test' , np.array(completeframe, dtype = np.uint8 ) )
     
         
     fgbg2 = cv2.createBackgroundSubtractorMOG2(0,50)
