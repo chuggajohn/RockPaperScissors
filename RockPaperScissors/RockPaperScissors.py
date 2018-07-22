@@ -80,11 +80,27 @@ while True:
         cv2.drawContours(drawing, [res], 0, (0, 255, 0), 2)
         cv2.drawContours(drawing, [hull], 0, (0, 0, 255), 3)
 
-        isFinishCal,cnt = calculateFingers(res,drawing)
-                    
-        cv2.imshow('output', drawing)
+        isFinishCal,cnt = calculateFingers(res,drawing)           
+        cv2.imshow('drawing', drawing)
+        print(drawing.shape)
         
+        if cnt == 0:
+            text = "Rock"
+        elif cnt == 1:
+            text = "Paper"
+        elif cnt == 4:
+            text = "Scissors"
+        else:
+            text = "Unknown"
 
+        drawingText = cv2.putText(drawing, #target image
+            text, #text
+            (450, 400), #position
+            cv2.FONT_HERSHEY_DUPLEX,
+            1.0,
+            (118, 185, 0), #font color
+            2);        
+        #cv2.imshow('output', drawingText)
      
 
     fgbg2 = cv2.createBackgroundSubtractorMOG2(0,50)
