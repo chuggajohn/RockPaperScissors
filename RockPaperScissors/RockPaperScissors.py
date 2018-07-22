@@ -81,8 +81,7 @@ while True:
         cv2.drawContours(drawing, [hull], 0, (0, 0, 255), 3)
 
         isFinishCal,cnt = calculateFingers(res,drawing)           
-        cv2.imshow('drawing', drawing)
-        print(drawing.shape)
+        #cv2.imshow('drawing', drawing)
         
         if cnt == 0:
             text = "Rock"
@@ -100,7 +99,7 @@ while True:
             1.0,
             (118, 185, 0), #font color
             2);        
-        #cv2.imshow('output', drawingText)
+        cv2.imshow('output', drawingText)
      
 
     fgbg2 = cv2.createBackgroundSubtractorMOG2(0,50)
