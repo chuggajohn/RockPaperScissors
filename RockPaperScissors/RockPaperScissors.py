@@ -1,3 +1,5 @@
+#Code Written by Ryan Lau and John Anderson
+
 import cv2
 import numpy as np
 import time
@@ -30,7 +32,7 @@ def calculateFingers(res,drawing):  # -> finished bool, cnt: finger count
             return True, cnt
     return False, 0
     
-def claculateHand(img):
+def calculateHand(img):
     _,contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     length = len(contours)
     maxArea = -1
@@ -88,31 +90,33 @@ fgmask2 = fgbg2.apply(oldframe)
 while True:
     ret, frame = cam.read()
     fgmask2 = fgbg2.apply(frame, 0)
-    masked = cv2.bitwise_and(frame, frame, mask=fgmask2)
-    cv2.imshow("masked applied",masked)
+    masked = cv2.bitwise_and(frame, frame, mask=fgmask2) #Perform background subtraction
+    #cv2.imshow("masked applied",masked)
     
-
-    gs = cv2.cvtColor(masked,cv2.COLOR_RGB2GRAY)
+	
+    gs = cv2.cvtColor(masked,cv2.COLOR_RGB2GRAY) #Perform Grayscale Operation
     #cv2.imshow("Gscale", gs)
-    ret, Thold = cv2.threshold(gs, 31, 255, cv2.THRESH_BINARY)
+    ret, Thold = cv2.threshold(gs, 31, 255, cv2.THRESH_BINARY) #Perform Thresholding
     #cv2.imshow("Threshold", Thold)
-    Medianed = cv2.medianBlur(Thold, 9)
+    Medianed = cv2.medianBlur(Thold, 9) #Perform Median Filter
     #cv2.imshow("median", Medianed)
-    closing = cv2.morphologyEx(Medianed, cv2.MORPH_CLOSE, rectkernel)
+    closing = cv2.morphologyEx(Medianed, cv2.MORPH_CLOSE, rectkernel) #Perform Closing Operation
     #cv2.imshow("closing", closing)
-    orgrighthalf , orglefthalf= np.hsplit(frame,2)
+	
+    orgrighthalf , orglefthalf= np.hsplit(frame,2) #Split Frame into two halves
     righthalf ,lefthalf = np.hsplit(closing,2)
     
+	#Add text identifying hand
     completeframe = np.hstack((orgrighthalf,line,orglefthalf))
     cv2.putText(completeframe, #target image
-            claculateHand(righthalf), #text
+            calculateHand(righthalf), #text
             (175, 400), #position
             cv2.FONT_HERSHEY_DUPLEX,
             1.0,
             (118, 185, 0), #font color
             2);
     cv2.putText(completeframe, #target image
-            claculateHand(lefthalf), #text
+            calculateHand(lefthalf), #text
             (450, 400), #position
             cv2.FONT_HERSHEY_DUPLEX,
             1.0,
@@ -124,7 +128,7 @@ while True:
     
         
     fgbg2 = cv2.createBackgroundSubtractorMOG2(0,50)
-    fgmask2 = fgbg2.apply(oldframe)
+    fgmask2 = fgbg2.apply(oldframe) # Reapply background subtraction next cycle
     k = cv2.waitKey(10)
     if k%256 == 27:
         # ESC pressed, exit
